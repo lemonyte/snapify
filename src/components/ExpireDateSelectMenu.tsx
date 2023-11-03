@@ -20,6 +20,7 @@ export default function ExpireDateSelectMenu({
   const setShareLinkExpiresAtMutation =
     api.video.setShareLinkExpiresAt.useMutation({
       onMutate: async ({ videoId, shareLinkExpiresAt }) => {
+        if (!shareLinkExpiresAt) return;
         await utils.video.get.cancel();
         const previousValue = utils.video.get.getData({ videoId });
         if (previousValue) {
@@ -92,7 +93,7 @@ export default function ExpireDateSelectMenu({
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Listbox.Options className="absolute z-10 mt-1 max-h-60 max-h-[300px] w-[220px] overflow-auto rounded-md bg-white py-1 py-2 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-[220px] overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {availableExpireDates.map((person, personIdx) => (
                 <Listbox.Option
                   key={personIdx}

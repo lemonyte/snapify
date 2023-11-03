@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import logo from "~/assets/logo.png";
 import Image from "next/image";
 
 const navigation = [
   { name: "Overview", href: "/" },
-  { name: "Pricing", href: "/pricing" },
-  { name: "Github", href: "https://github.com/MarconLP/snapify" },
+  { name: "Github", href: "https://github.com/lemonyte/snapify" },
 ];
 
 export default function Header() {
@@ -55,29 +53,6 @@ export default function Header() {
             </Link>
           ))}
         </div>
-
-        <Link
-          href="/sign-in"
-          className="hidden text-sm font-semibold leading-6 text-gray-900 md:block"
-        >
-          Log in <span aria-hidden="true">&rarr;</span>
-        </Link>
-
-        <div className="flex flex-row items-center md:hidden">
-          <Link
-            href="/sign-in"
-            className="text-sm font-semibold leading-6 text-gray-900"
-          >
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
-          <div
-            className="flex h-[42px] w-[42px] cursor-pointer items-center justify-center"
-            onClick={() => setNavbarOpen(!navbarOpen)}
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </div>
-        </div>
-
         <div
           style={{
             transition: "all 0.2s cubic-bezier(.17,.27,0,.99)",

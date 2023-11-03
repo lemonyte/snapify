@@ -1,24 +1,19 @@
 import React, { type ChangeEvent, Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { api } from "~/utils/api";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { useAtom } from "jotai";
 import uploadVideoModalOpen from "~/atoms/uploadVideoModalOpen";
-import { usePostHog } from "posthog-js/react";
-import { useSession } from "next-auth/react";
-import generateThumbnail from "~/utils/generateThumbnail";
+import { uploadVideo } from "~/utils/filestore";
 
 export default function VideoUploadModal() {
   const [open, setOpen] = useAtom(uploadVideoModalOpen);
   const router = useRouter();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [file, setFile] = useState<File>();
-  const getSignedUrl = api.video.getUploadUrl.useMutation();
+  const createVideoMutation = api.video.createVideo.useMutation();
   const apiUtils = api.useContext();
   const videoRef = useRef<null | HTMLVideoElement>(null);
-  const posthog = usePostHog();
-  const { data: session } = useSession();
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files) {
@@ -28,40 +23,17 @@ export default function VideoUploadModal() {
 
   function closeModal() {
     setOpen(false);
-
-    posthog?.capture("cancel video upload", {
-      stripeSubscriptionStatus: session?.user.stripeSubscriptionStatus,
-    });
   }
 
   const handleSubmit = async (): Promise<void> => {
     if (!file) return;
     setSubmitting(true);
-    const { signedVideoUrl, signedThumbnailUrl, id } =
-      await getSignedUrl.mutateAsync({
-        key: file.name,
-      });
-    await axios
-      .put(signedVideoUrl, file.slice(), {
-        headers: { "Content-Type": file.type },
-      })
-      .then(async () => {
-        if (!videoRef.current) return;
-        return axios.put(
-          signedThumbnailUrl,
-          await generateThumbnail(videoRef.current),
-          {
-            headers: { "Content-Type": "image/png" },
-          }
-        );
-      })
-      .then(() => {
-        setOpen(false);
-        void router.push("share/" + id);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+    const { id } = await createVideoMutation.mutateAsync();
+    await uploadVideo(id, file, videoRef);
+    setOpen(false);
+    void router.push(`share/${id}`);
+
     setSubmitting(false);
     void apiUtils.video.getAll.invalidate();
   };

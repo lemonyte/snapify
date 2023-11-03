@@ -1,25 +1,25 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("videos", () => {
-  // test("should be able to view videos", async ({ page }) => {
-  //   await page.goto("http://localhost:3000/");
-  //   await page
-  //     .getByRole("link", {
-  //       name: "Go to Videos → The entire videos collection",
-  //     })
-  //     .click();
-  //   await expect(page).toHaveURL("http://localhost:3000/videos");
-  // });
+  test("should be able to view videos", async ({ page }) => {
+    await page.goto("http://localhost:3000/");
+    await page
+      .getByRole("link", {
+        name: "Go to Videos → The entire videos collection",
+      })
+      .click();
+    await expect(page).toHaveURL("http://localhost:3000/");
+  });
 
   test("no videos should exist", async ({ page }) => {
-    await page.goto("http://localhost:3000/videos");
+    await page.goto("http://localhost:3000/");
     await expect(page.locator("div.flex-start > div > span")).toContainText(
       "You do not have any recordings."
     );
   });
 
   test("can upload video", async ({ page }) => {
-    await page.goto("http://localhost:3000/videos");
+    await page.goto("http://localhost:3000/");
     await page.getByText("New video").click();
     await page
       .getByText("Drop files to Attach, or browse")
@@ -32,7 +32,7 @@ test.describe("videos", () => {
       }
     );
 
-    await page.click('[href="/videos"]');
+    await page.click('[href="/"]');
     await page.getByText("example_video.webm").click();
     await expect(page).toHaveURL(
       /http:\/\/localhost:3000\/share\/[A-Za-z0-9]+/

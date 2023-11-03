@@ -1,16 +1,48 @@
-import { PrismaClient } from "@prisma/client";
+import { Base } from "deta";
+import type { CompositeType, ObjectType } from "deta/dist/types/types/basic";
 
-import { env } from "~/env.mjs";
+export const base = Base("videos");
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+export interface Video {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
+  sharing: boolean,
+  delete_after_link_expires: boolean,
+  shareLinkExpiresAt: string,
+  linkShareSeo: boolean,
+  title: string,
+}
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
+class DB {
+  async create<T>(data: ObjectType): Promise<T> {
+    return await base.put(data) as T;
+  }
 
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  async findUnique<T>(key: string): Promise<T> {
+    return await base.get(key) as T;
+  }
+
+  async findMany<T>(query: CompositeType | undefined = undefined): Promise<T[]> {
+    const res = await base.fetch(query);
+    return res.items as T[];
+  }
+
+  async updateMany<T>(query: CompositeType | undefined, updates: ObjectType): Promise<T[]> {
+    const { items } = await base.fetch(query);
+    for (const item of items) {
+      await base.update(updates, item.key as string);
+    }
+    return await base.fetch(query).then((res) => res.items) as T[];
+  }
+
+  async deleteMany<T>(query: CompositeType | undefined): Promise<T[]> {
+    const { items } = await base.fetch(query);
+    for (const item of items) {
+      await base.delete(item.key as string);
+    }
+    return items as T[];
+  }
+}
+
+export const db = new DB();

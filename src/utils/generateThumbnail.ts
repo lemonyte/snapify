@@ -1,5 +1,4 @@
-export default async function generateThumbnail(video: HTMLVideoElement) {
-  console.log(video.duration);
+export default async function generateThumbnail(video: HTMLVideoElement): Promise<Blob | null> {
   const seekedPromise = new Promise<void>((resolve) => {
     video.addEventListener("seeked", () => {
       resolve();

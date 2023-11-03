@@ -3,7 +3,6 @@ import { Fragment, useState } from "react";
 import { ModernSwitch } from "~/components/ModernSwitch";
 import { api, type RouterOutputs } from "~/utils/api";
 import ExpireDateSelectMenu from "~/components/ExpireDateSelectMenu";
-import { usePostHog } from "posthog-js/react";
 
 interface Props {
   video: RouterOutputs["video"]["get"];
@@ -12,22 +11,13 @@ interface Props {
 export function ShareModal({ video }: Props) {
   const utils = api.useContext();
   const [open, setOpen] = useState<boolean>(false);
-  const posthog = usePostHog();
 
   const openModal = () => {
     setOpen(true);
-    posthog?.capture("open video share modal", {
-      videoSharing: video.sharing,
-      videoId: video.id,
-    });
   };
 
   const closeModal = () => {
     setOpen(false);
-    posthog?.capture("close video share modal", {
-      videoSharing: video.sharing,
-      videoId: video.id,
-    });
   };
 
   const setSharingMutation = api.video.setSharing.useMutation({
@@ -77,10 +67,6 @@ export function ShareModal({ video }: Props) {
       setLinkCopied(false);
     }, 5000);
 
-    posthog?.capture("public video link copied", {
-      videoSharing: video.sharing,
-      videoId: video.id,
-    });
   };
 
   return (

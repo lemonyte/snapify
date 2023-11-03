@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("video", () => {
   test("should be able to view video", async ({ page }) => {
-    await page.goto("http://localhost:3000/videos");
+    await page.goto("http://localhost:3000/");
     await page.locator("div.grid > a:nth-child(1)").click();
     await expect(page).toHaveURL(
       /http:\/\/localhost:3000\/share\/[A-Za-z0-9]+/
@@ -21,7 +21,7 @@ test.describe("video", () => {
   test("should be able to rename video", async ({ page }) => {
     const randomTitle = "Random title " + Math.random().toString();
 
-    await page.goto("http://localhost:3000/videos");
+    await page.goto("http://localhost:3000/");
     await page.locator("div.grid > a:nth-child(1)").click();
     await expect(page).toHaveURL(
       /http:\/\/localhost:3000\/share\/[A-Za-z0-9]+/
@@ -38,7 +38,7 @@ test.describe("video", () => {
   });
 
   test("should be able to share video", async ({ page }) => {
-    await page.goto("http://localhost:3000/videos");
+    await page.goto("http://localhost:3000/");
     await page.locator("div.grid > a:nth-child(1)").click();
     await expect(page).toHaveURL(
       /http:\/\/localhost:3000\/share\/[A-Za-z0-9]+/

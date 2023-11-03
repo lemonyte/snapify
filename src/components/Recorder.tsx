@@ -6,18 +6,14 @@ import { MicrophoneIcon, PauseIcon } from "@heroicons/react/24/outline";
 import { ResumeIcon, TrashIcon } from "@radix-ui/react-icons";
 import { StopIcon } from "@heroicons/react/24/solid";
 import StopTime from "~/components/StopTime";
-import axios from "axios";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
-import { TRPCClientError } from "@trpc/client";
 import { useAtom } from "jotai";
-import paywallAtom from "~/atoms/paywallAtom";
 import recordVideoModalOpen from "~/atoms/recordVideoModalOpen";
-import { usePostHog } from "posthog-js/react";
 import Tooltip from "~/components/Tooltip";
-import generateThumbnail from "~/utils/generateThumbnail";
 import * as EBML from "ts-ebml";
+import { uploadVideo } from "~/utils/filestore";
 
 interface Props {
   closeModal: () => void;
@@ -44,11 +40,9 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
   const [, setRecordOpen] = useAtom(recordVideoModalOpen);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const apiUtils = api.useContext();
-  const getSignedUrl = api.video.getUploadUrl.useMutation();
+  const createVideoMutation = api.video.createVideo.useMutation();
   const [duration, setDuration] = useState<number>(0);
-  const [, setPaywallOpen] = useAtom(paywallAtom);
   const videoRef = useRef<null | HTMLVideoElement>(null);
-  const posthog = usePostHog();
 
   const handleRecording = async () => {
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -99,8 +93,6 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
     recorderRef.current.startRecording();
 
     setStep("in");
-
-    posthog?.capture("recorder: start video recording");
   };
 
   function getSeekableBlob(inputBlob: Blob, callback: (blob: Blob) => void) {
@@ -109,7 +101,7 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
     const tools = EBML.tools;
 
     const fileReader = new FileReader();
-    fileReader.onload = function (e) {
+    fileReader.onload = function () {
       if (!this.result || typeof this.result === "string") return;
       const ebmlElms = decoder.decode(this.result);
       ebmlElms.forEach(function (element) {
@@ -145,8 +137,6 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
     });
 
     setStep("post");
-
-    posthog?.capture("recorder: video recording finished");
   };
 
   const handleDelete = () => {
@@ -158,19 +148,15 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
 
     closeModal();
     setStep("pre");
-
-    posthog?.capture("recorder: video deleted");
   };
 
   const handlePause = () => {
     if (recorderRef.current) {
-      console.log(recorderRef.current?.state);
       if (pause) {
         recorderRef.current?.resumeRecording();
       } else {
         recorderRef.current.pauseRecording();
       }
-      posthog?.capture("recorder: recording paused/resumed", { pause });
       setPause(!pause);
     }
   };
@@ -203,63 +189,20 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
         "Recording - " + dayjs().format("D MMM YYYY") + ".webm";
       invokeSaveAsDialog(blob, dateString);
     }
-
-    posthog?.capture("recorder: video downloaded");
   };
 
   const handleUpload = async () => {
     if (!blob || !videoRef.current) return;
 
-    const dateString = "Recording - " + dayjs().format("D MMM YYYY") + ".webm";
     setSubmitting(true);
 
     try {
-      const { signedVideoUrl, signedThumbnailUrl, id } =
-        await getSignedUrl.mutateAsync({
-          key: dateString,
-        });
-
-      await axios
-        .put(signedVideoUrl, blob.slice(), {
-          headers: { "Content-Type": "video/webm" },
-        })
-        .then(async () => {
-          if (!videoRef.current) return;
-          return axios.put(
-            signedThumbnailUrl,
-            await generateThumbnail(videoRef.current),
-            {
-              headers: { "Content-Type": "image/png" },
-            }
-          );
-        })
-        .then(() => {
-          void router.push("share/" + id);
-          setRecordOpen(false);
-          posthog?.capture("recorder: video uploaded");
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      const { id } = await createVideoMutation.mutateAsync();
+      await uploadVideo(id, blob, videoRef);
+      void router.push("share/" + id);
+      setRecordOpen(false);
     } catch (err) {
-      if (err instanceof TRPCClientError) {
-        if (
-          err.message ===
-          "Sorry, you have reached the maximum video upload limit on our free tier. Please upgrade to upload more."
-        ) {
-          posthog?.capture("recorder: video upload paywall hit");
-          setPaywallOpen(true);
-        } else if (err.message === "UNAUTHORIZED") {
-          window.open(
-            `/sign-in?redirect=${encodeURIComponent("/window-close")}`,
-            "Sign In",
-            "width=500,height=500"
-          );
-          posthog?.capture("recorder: guest tried to upload");
-        }
-      } else {
-        throw err;
-      }
+      throw err;
     } finally {
       setSubmitting(false);
     }
@@ -393,8 +336,6 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
             <video
               src={URL.createObjectURL(blob)}
               controls
-              onPlay={() => posthog?.capture("recorder: played preview video")}
-              onPause={() => posthog?.capture("recorder: paused preview video")}
               ref={videoRef}
               className="mb-4 max-h-[75vh] w-[75vw]"
             />
@@ -445,7 +386,6 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
               type="button"
               className="ml-auto inline-flex items-center rounded-md bg-[#dc2625] px-4 py-2 text-sm font-semibold leading-6 text-white shadow transition duration-150 ease-in-out hover:opacity-80 disabled:cursor-not-allowed"
               onClick={() => {
-                posthog?.capture("recorder: closed post-modal");
                 void closeModal();
               }}
             >

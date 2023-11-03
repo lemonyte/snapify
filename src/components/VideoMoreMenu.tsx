@@ -8,7 +8,6 @@ import {
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
-import { usePostHog } from "posthog-js/react";
 
 interface Props {
   video: RouterOutputs["video"]["get"];
@@ -19,7 +18,6 @@ export default function VideoMoreMenu({ video }: Props) {
   const [renameMenuOpen, setRenameMenuOpen] = useState<boolean>(false);
   const utils = api.useContext();
   const router = useRouter();
-  const posthog = usePostHog();
 
   const items = [
     {
@@ -44,10 +42,6 @@ export default function VideoMoreMenu({ video }: Props) {
               a.download = video.title;
               a.click();
             });
-          });
-
-          posthog?.capture("download existing video", {
-            videoId: video.id,
           });
         },
       },
@@ -81,7 +75,7 @@ export default function VideoMoreMenu({ video }: Props) {
     },
     onSettled: () => {
       void utils.video.getAll.invalidate();
-      void router.push("/videos");
+      void router.push("/");
     },
   });
 
