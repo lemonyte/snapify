@@ -8,7 +8,7 @@ interface Props {
   video: RouterOutputs["video"]["get"];
 }
 
-export function ShareModal({ video }: Props) {
+export default function ShareModal({ video }: Props) {
   const utils = api.useContext();
   const [open, setOpen] = useState<boolean>(false);
 
