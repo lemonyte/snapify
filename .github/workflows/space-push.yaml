@@ -8,14 +8,10 @@ on:
 concurrency: push-${{ github.sha }}
 
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yaml
   push:
     name: Push to Space
     runs-on: ubuntu-latest
     environment: Testing
-    needs: build
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
