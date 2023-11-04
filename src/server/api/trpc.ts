@@ -35,7 +35,6 @@ type CreateContextOptions = {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     db,
-    filestore: getFilestore(),
     req: opts.req,
     res: opts.res,
   };
@@ -65,7 +64,6 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getFilestore } from "~/utils/filestore";
 import { type NextApiRequest, type NextApiResponse } from "next";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({

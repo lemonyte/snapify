@@ -1,21 +1,17 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  procedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, procedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import type { Video } from "~/server/db";
+import type { VideoMetadata } from "~/server/db";
+import { deleteVideo } from "~/utils/filestore";
 
 export const videoRouter = createTRPCRouter({
   getAll: procedure.query(async ({ ctx: { db } }) => {
-    const videos = (await db.findMany<Video>()).map((video) => {
-      return { ...video, shareLinkExpiresAt: new Date(video.shareLinkExpiresAt) };
-    });
+    const videos = await db.findMany<VideoMetadata>();
 
     const videosWithThumbnailUrl = await Promise.all(
       videos.map((video) => {
-        const thumbnailUrl = `/api/video?id=${video.id}.png`;
+        const thumbnailUrl = `/api/private/thumbnail?id=${video.id}`;
         return { ...video, thumbnailUrl };
       })
     );
@@ -26,34 +22,57 @@ export const videoRouter = createTRPCRouter({
     .input(z.object({ videoId: z.string() }))
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const video = await db.findUnique<Video>(input.videoId);
+      const video = await db.findUnique<VideoMetadata>(input.videoId);
       if (!video) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const shareLinkExpiresAt = new Date(video.shareLinkExpiresAt);
+      const signedUrl = `/api/private/video?id=${video.id}`;
+      const thumbnailUrl = `/api/private/thumbnail?id=${video.id}`;
 
-      const signedUrl = `/api/video?id=${video.id}.webm`;
-
-      const thumbnailUrl = `/api/video?id=${video.id}.png`;
-
-      return { ...video, video_url: signedUrl, thumbnailUrl, shareLinkExpiresAt };
+      return {
+        ...video,
+        video_url: signedUrl,
+        thumbnailUrl,
+      };
     }),
-  createVideo: procedure
-    .mutation(async ({ ctx: { db } }) => {
-      const id = crypto.randomUUID();
-      const video = await db.create<Video>({
-        key: id,
-        id,
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-        sharing: false,
-        delete_after_link_expires: false,
-        linkShareSeo: false,
-      });
+  getPublic: procedure
+    .input(z.object({ videoId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const video = await db.findUnique<VideoMetadata>(input.videoId);
+      if (!video) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      if (!video.sharing) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
 
-      return video;
+      const signedUrl = `/api/public/video?id=${video.id}`;
+      const thumbnailUrl = `/api/public/thumbnail?id=${video.id}`;
+
+      return {
+        ...video,
+        video_url: signedUrl,
+        thumbnailUrl,
+      };
     }),
+  createVideo: procedure.mutation(async ({ ctx: { db } }) => {
+    const id = crypto.randomUUID();
+    const video = await db.create<VideoMetadata>({
+      key: id,
+      id,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      sharing: false,
+      delete_after_link_expires: false,
+      linkShareSeo: false,
+      shareLinkExpiresAt: null,
+      title: "",
+    });
+
+    return video;
+  }),
   setSharing: procedure
     .input(z.object({ videoId: z.string(), sharing: z.boolean() }))
     .mutation(async ({ ctx: { db }, input }) => {
@@ -152,26 +171,22 @@ export const videoRouter = createTRPCRouter({
         videoId: z.string(),
       })
     )
-    .mutation(async ({ ctx: { db, filestore }, input }) => {
-      const deleteVideo = await db.deleteMany({
+    .mutation(async ({ ctx: { db }, input }) => {
+      const { videoId: id } = input;
+      const deleteMetadata = await db.deleteMany({
         id: input.videoId,
       });
 
-      if (deleteVideo.length === 0) {
+      if (deleteMetadata.length === 0) {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
-      const deleteVideoObject = await filestore.delete(input.videoId);
-
-      const deleteThumbnailObject = await filestore.delete(
-        input.videoId + ".png"
-      );
+      const deleteVideoObject = await deleteVideo(id);
 
       return {
         success: true,
-        deleteVideo,
+        deleteVideo: deleteMetadata,
         deleteVideoObject,
-        deleteThumbnailObject,
       };
     }),
 });

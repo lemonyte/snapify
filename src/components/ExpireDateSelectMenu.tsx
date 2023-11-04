@@ -7,7 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
 interface Props {
-  shareLinkExpiresAt: Date | null;
+  shareLinkExpiresAt: Date | number | null;
   videoId: string;
 }
 
@@ -26,7 +26,10 @@ export default function ExpireDateSelectMenu({
         if (previousValue) {
           utils.video.get.setData(
             { videoId },
-            { ...previousValue, shareLinkExpiresAt }
+            {
+              ...previousValue,
+              shareLinkExpiresAt: shareLinkExpiresAt.getTime(),
+            }
           );
         }
         return { previousValue };

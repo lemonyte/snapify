@@ -88,7 +88,8 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
       type: "video",
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      mimeType: 'video/webm;codecs="vp9,opus"',
+      // mimeType: 'video/webm;codecs="vp9,opus"',
+      mimeType: "video/webm;codecs=vp9",
     });
     recorderRef.current.startRecording();
 
@@ -197,9 +198,12 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
     setSubmitting(true);
 
     try {
-      const { id } = await createVideoMutation.mutateAsync();
-      await uploadVideo(id, blob, videoRef);
-      void router.push("share/" + id);
+      const video = await createVideoMutation.mutateAsync();
+      if (!video) {
+        throw new Error("Failed to create video, please try again.");
+      }
+      await uploadVideo(video.id, blob, videoRef);
+      void router.push("share/" + video.id);
       setRecordOpen(false);
     } catch (err) {
       throw err;

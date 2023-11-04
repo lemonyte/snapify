@@ -29,7 +29,11 @@ export default function VideoUploadModal() {
     if (!file) return;
     setSubmitting(true);
 
-    const { id } = await createVideoMutation.mutateAsync();
+    const video = await createVideoMutation.mutateAsync();
+    if (!video) {
+      throw new Error("Failed to create video, please try again.");
+    }
+    const id = video.id;
     await uploadVideo(id, file, videoRef);
     setOpen(false);
     void router.push(`share/${id}`);
