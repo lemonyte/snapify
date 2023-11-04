@@ -61,7 +61,8 @@ export function ShareModal({ video }: Props) {
   const [linkCopied, setLinkCopied] = useState<boolean>(false);
 
   const handleCopy = () => {
-    void navigator.clipboard.writeText(window.location.href);
+    const link = `${window.location.protocol}//${window.location.host}/public/${video.id}`;
+    void navigator.clipboard.writeText(link);
     setLinkCopied(true);
     setTimeout(() => {
       setLinkCopied(false);

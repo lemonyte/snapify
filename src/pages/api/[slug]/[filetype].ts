@@ -1,5 +1,6 @@
 import { Readable } from "stream";
-import { getFilestore } from "~/utils/filestore";
+import { getVideo, getThumbnail } from "~/utils/filestore";
+import { db, type VideoMetadata } from "~/server/db";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export const config = {
@@ -12,13 +13,22 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const filestore = getFilestore();
+  const { slug, filetype, id } = req.query as { slug: string; filetype: string, id: string };
   if (req.method === "GET") {
-    if (!req.query.id) {
+    if (!["public", "private"].includes(slug) || !["video", "thumbnail"].includes(filetype)) {
+      res.status(404).end();
+      return;
+    }
+    if (!id) {
       res.status(400).end();
       return;
     }
-    const blob = await filestore.get(req.query.id as string);
+    const metadata = await db.findUnique<VideoMetadata>(id);
+    if (slug === "public" && !metadata?.sharing) {
+      res.status(403).end();
+      return;
+    }
+    const blob = filetype === "video" ? await getVideo(id) : await getThumbnail(id);
     if (!blob) {
       res.status(404).end();
       return;
@@ -29,17 +39,6 @@ export default async function handler(
       readable.pipe(res);
       readable.on("end", resolve);
     });
-  } else if (req.method === "PUT") {
-    res.status(418).send("Not implemented");
-    // console.log("PUT", req.headers["content-type"])
-    // console.log("reading body")
-    // const data = req.read() as Buffer;
-    // console.log("putting file")
-    // const result = await filestore.put(req.query.id as string, {
-    //   contentType: req.headers["content-type"],
-    //   data: data,
-    // })
-    // res.status(201).send(result);
   } else {
     res.status(405).end();
   }

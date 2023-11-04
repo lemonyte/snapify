@@ -169,7 +169,7 @@ const VideoCardSkeleton = () => {
 
 const VideoCard = ({ title, id, createdAt, thumbnailUrl }: VideoCardProps) => {
   return (
-    <Link href={`/share/${id}`}>
+    <Link href={`/private/${id}`}>
       <div className="w-[250px] cursor-pointer overflow-hidden rounded-lg border border-[#6c668533] text-sm font-normal">
         <figure>
           <Image

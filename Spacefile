@@ -7,3 +7,9 @@ micros:
     engine: next
     primary: true
     dev: npm run dev
+    public_routes:
+      - /favicon.ico
+      - /_next/*
+      - /public/*
+      - /api/public/*
+      - /api/trpc/video.getPublic

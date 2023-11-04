@@ -12,9 +12,13 @@ import logo from "~/assets/logo.png";
 
 const VideoList: NextPage = () => {
   const router = useRouter();
-  const { videoId } = router.query as { videoId: string };
+  const { slug, videoId } = router.query as { slug: string; videoId: string };
 
-  const { data: video, isLoading } = api.video.get.useQuery(
+  const endpoint =
+    slug === "public"
+      ? (api.video.getPublic as unknown as typeof api.video.get)
+      : api.video.get;
+  const { data: video, isLoading } = endpoint.useQuery(
     { videoId },
     {
       enabled: router.isReady,
@@ -53,35 +57,38 @@ const VideoList: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex h-screen w-screen flex-col items-center justify-center">
-        <div className="flex min-h-[62px] w-full items-center justify-between border-b border-solid border-b-[#E7E9EB] bg-white px-6">
-          <Link href="/" className="flex items-center">
-            <Image
-              className="cursor-pointer p-2"
-              src={logo}
-              alt="logo"
-              width={42}
-              height={42}
-              unoptimized
-            />
-            <span>Snapify</span>
-          </Link>
-          <div className="flex items-center justify-center">
-            {video ? (
-              <>
-                <VideoMoreMenu video={video} />
-                <ShareModal video={video} />
-              </>
-            ) : null}
+        {slug !== "public" ? (
+          <div className="flex min-h-[62px] w-full items-center justify-between border-b border-solid border-b-[#E7E9EB] bg-white px-6">
+            <Link href="/" className="flex items-center">
+              <Image
+                className="cursor-pointer p-2"
+                src={logo}
+                alt="logo"
+                width={42}
+                height={42}
+                unoptimized
+              />
+              <span>Snapify</span>
+            </Link>
+            <div className="flex items-center justify-center">
+              {video ? (
+                <>
+                  <VideoMoreMenu video={video} />
+                  <ShareModal video={video} />
+                </>
+              ) : null}
 
-            <>
-              <Link href="/">
-                <span className="cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]">
-                  My Library
-                </span>
-              </Link>
-            </>
+              <>
+                <Link href="/">
+                  <span className="cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]">
+                    My Library
+                  </span>
+                </Link>
+              </>
+            </div>
           </div>
-        </div>
+        ) : null}
+
         <div className="flex h-full w-full grow flex-col items-center justify-start overflow-auto bg-[#fbfbfb]">
           <div className="flex aspect-video max-h-[calc(100vh_-_169px)] w-full justify-center bg-black 2xl:max-h-[1160px]">
             {video?.video_url && (
@@ -100,7 +107,7 @@ const VideoList: NextPage = () => {
                   {video?.title ?? video?.id}
                 </span>
                 <span className="text-[18px] text-sm text-gray-800">
-                  {video ? getTime(new Date(video.createdAt)): ""}
+                  {video ? getTime(new Date(video.createdAt)) : ""}
                 </span>
               </div>
             </div>
