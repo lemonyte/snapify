@@ -183,7 +183,7 @@ const VideoCard = ({ title, id, createdAt, thumbnailUrl }: VideoCardProps) => {
         </figure>
         <div className="m-4 flex flex-col">
           <span className="line-clamp-2 inline overflow-ellipsis whitespace-nowrap font-bold text-[0f0f0f]">
-            {title ?? id}
+            {title || id}
           </span>
           <span className="mt-2 text-[#606060]">{getTime(createdAt)}</span>
         </div>
