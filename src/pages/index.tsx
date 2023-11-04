@@ -4,16 +4,14 @@ import { api } from "~/utils/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getTime } from "~/utils/getTime";
-import NewVideoMenu from "~/components/NewVideoMenu";
-import VideoRecordModal from "~/components/VideoRecordModal";
-import VideoUploadModal from "~/components/VideoUploadModal";
+import Header from "~/components/Header";
+import Footer from "~/components/Footer";
 import { useAtom } from "jotai";
 import uploadVideoModalOpen from "~/atoms/uploadVideoModalOpen";
 import recordVideoModalOpen from "~/atoms/recordVideoModalOpen";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import logo from "~/assets/logo.png";
 
 const VideoList: NextPage = () => {
   const [, setRecordOpen] = useAtom(recordVideoModalOpen);
@@ -66,25 +64,8 @@ const VideoList: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex h-screen min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="flex min-h-[62px] w-full items-center justify-between border-b border-solid border-b-[#E7E9EB] bg-white px-6">
-          <Link href="/" className="flex items-center">
-            <Image
-              className="cursor-pointer p-2"
-              src={logo}
-              alt="logo"
-              width={42}
-              height={42}
-              unoptimized
-            />
-            <span>Snapify</span>
-          </Link>
-          <div className="flex flex-row items-center justify-center">
-            <VideoRecordModal />
-            <VideoUploadModal />
-            <NewVideoMenu />
-          </div>
-        </div>
+      <Header isPublic={false} />
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div
           className="flex w-full grow items-start justify-center overflow-auto bg-[#fbfbfb] pt-14"
           suppressHydrationWarning={true}
@@ -144,6 +125,7 @@ const VideoList: NextPage = () => {
           }
         </div>
       </main>
+      <Footer />
     </>
   );
 };

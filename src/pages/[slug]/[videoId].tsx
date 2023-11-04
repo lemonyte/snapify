@@ -1,18 +1,30 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { getTime } from "~/utils/getTime";
-import { ShareModal } from "~/components/ShareModal";
-import VideoMoreMenu from "~/components/VideoMoreMenu";
 import VideoRecordModal from "~/components/VideoRecordModal";
-import logo from "~/assets/logo.png";
+import Header from "~/components/Header";
+import Footer from "~/components/Footer";
+import React, { useState, useEffect } from "react";
 
 const VideoList: NextPage = () => {
   const router = useRouter();
   const { slug, videoId } = router.query as { slug: string; videoId: string };
+  const [aspectRatio, setAspectRatio] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setAspectRatio(screen.height / screen.width);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const endpoint =
     slug === "public"
@@ -41,10 +53,10 @@ const VideoList: NextPage = () => {
   }
 
   return (
-    <>
+    <div className="flex h-screen flex-col">
       <Head>
         <title>
-          {video?.title ?? "Snapify | The Open Source Loom Alternative"}
+          {video?.title || "Snapify | The Open Source Loom Alternative"}
         </title>
         <meta property="og:image" content={video?.thumbnailUrl} />
         <meta property="og:image:type" content="image/png" />
@@ -56,67 +68,46 @@ const VideoList: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex h-screen w-screen flex-col items-center justify-center">
-        {slug !== "public" ? (
-          <div className="flex min-h-[62px] w-full items-center justify-between border-b border-solid border-b-[#E7E9EB] bg-white px-6">
-            <Link href="/" className="flex items-center">
-              <Image
-                className="cursor-pointer p-2"
-                src={logo}
-                alt="logo"
-                width={42}
-                height={42}
-                unoptimized
-              />
-              <span>Snapify</span>
-            </Link>
-            <div className="flex items-center justify-center">
-              {video ? (
-                <>
-                  <VideoMoreMenu video={video} />
-                  <ShareModal video={video} />
-                </>
-              ) : null}
-
-              <>
-                <Link href="/">
-                  <span className="cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]">
-                    My Library
-                  </span>
-                </Link>
-              </>
-            </div>
-          </div>
-        ) : null}
-
+      <Header isPublic={slug !== "private"} video={video} />
+      <main className="flex w-screen flex-grow flex-col items-center justify-center">
         <div className="flex h-full w-full grow flex-col items-center justify-start overflow-auto bg-[#fbfbfb]">
-          <div className="flex aspect-video max-h-[calc(100vh_-_169px)] w-full justify-center bg-black 2xl:max-h-[1160px]">
-            {video?.video_url && (
-              <>
-                <video controls className="h-full w-full">
-                  <source src={video.video_url} />
-                  Your browser does not support the video tag.
-                </video>
-              </>
+          <div
+            className={`flex max-h-[calc(100vh-62px)] w-screen justify-center`}
+            style={{ height: `calc(${aspectRatio}*100vw)` }}
+          >
+            {video?.video_url ? (
+              <video
+                controls
+                className="h-full max-h-[calc(100vh-62px)] w-full bg-black"
+                style={{ height: `calc(${aspectRatio}*100vw)` }}
+              >
+                <source src={video.video_url} />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <div
+                className="flex max-h-[calc(100vh-62px)] w-screen flex-col justify-center bg-black text-gray-400 text-center text-xl"
+                style={{ height: `calc(${aspectRatio}*100vw)` }}
+              >
+                Loading...
+              </div>
             )}
           </div>
-          <div className="mb-10 mt-4 w-full max-w-[1800px] pl-[24px]">
+          <div className="my-4 w-full px-[24px]">
             <div className="mb-4 flex flex-col">
-              <div className="mb-4 flex flex-col">
-                <span className="text-[18px] text-lg font-medium">
-                  {video?.title ?? video?.id}
-                </span>
-                <span className="text-[18px] text-sm text-gray-800">
-                  {video ? getTime(new Date(video.createdAt)) : ""}
-                </span>
-              </div>
+              <span className="text-[18px] text-lg font-medium">
+                {video ? video.title || video.id : "Loading..."}
+              </span>
+              <span className="text-[18px] text-sm text-gray-800">
+                {video ? getTime(new Date(video.createdAt)) : "Loading..."}
+              </span>
             </div>
           </div>
         </div>
       </main>
-
+      <Footer />
       <VideoRecordModal />
-    </>
+    </div>
   );
 };
 

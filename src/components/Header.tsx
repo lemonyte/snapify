@@ -1,22 +1,22 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import VideoRecordModal from "./VideoRecordModal";
+import VideoUploadModal from "./VideoUploadModal";
+import VideoMoreMenu from "./VideoMoreMenu";
+import ShareModal from "./ShareModal";
+import NewVideoMenu from "./NewVideoMenu";
 import logo from "~/assets/logo.png";
 import Image from "next/image";
+import type { RouterOutputs } from "~/utils/api";
 
-const navigation = [
-  { name: "Overview", href: "/" },
-  { name: "Github", href: "https://github.com/lemonyte/snapify" },
-];
-
-export default function Header() {
+export default function Header({
+  isPublic,
+  video,
+}: {
+  isPublic: boolean;
+  video?: RouterOutputs["video"]["get"];
+}) {
   const [attop, setAtTop] = useState(true);
-  const [navbarOpen, setNavbarOpen] = useState(false);
-  const router = useRouter();
-
-  const closeNav = () => {
-    setNavbarOpen(false);
-  };
   useEffect(() => {
     document.addEventListener("scroll", () => {
       setAtTop(window.scrollY <= 1);
@@ -28,8 +28,8 @@ export default function Header() {
       style={{ borderColor: attop ? "transparent" : "#E5E5E5" }}
       className="header sticky top-0 z-10 flex h-[64px] border-b bg-white bg-opacity-40 backdrop-blur-sm backdrop-saturate-200"
     >
-      <div className="m-auto flex w-[1048px] items-center justify-between px-[24px]">
-        <Link href="/">
+      <div className="flex min-h-[62px] w-full items-center justify-between border-b border-solid border-b-[#E7E9EB] bg-white px-6">
+        <Link href="/" className="flex items-center">
           <Image
             className="cursor-pointer p-2"
             src={logo}
@@ -38,40 +38,34 @@ export default function Header() {
             height={42}
             unoptimized
           />
+          <span>Snapify</span>
         </Link>
 
-        <div className="hidden md:block">
-          {navigation.map(({ href, name }) => (
-            <Link key={name} href={href}>
-              <span
-                className={`mx-[6px] cursor-pointer rounded-full p-2 text-sm text-[#666] hover:text-black ${
-                  router.asPath === href ? "bg-[#00000014]" : ""
-                }`}
-              >
-                {name}
+        <div className="flex flex-row items-center justify-center">
+          {!isPublic ? (
+            <>
+              {video ? (
+                <>
+                  <VideoMoreMenu video={video} />
+                  <ShareModal video={video} />
+                </>
+              ) : null}
+              <Link href="/" className="mr-4 px-2 py-2">
+                <span className="cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]">
+                  My Library
+                </span>
+              </Link>
+              <VideoRecordModal />
+              <VideoUploadModal />
+              <NewVideoMenu />
+            </>
+          ) : (
+            <Link href="https://deta.space/discovery/@lemonyte/snapify">
+              <span className="cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]">
+                Install on Space
               </span>
             </Link>
-          ))}
-        </div>
-        <div
-          style={{
-            transition: "all 0.2s cubic-bezier(.17,.27,0,.99)",
-            height: navbarOpen ? "calc(100vh - 64px)" : "calc(100vh - 80px)",
-            opacity: 0,
-          }}
-          className={`absolute left-0 right-0 bg-white px-6 pt-6 opacity-0 ${
-            navbarOpen
-              ? "visible top-[64px] block !opacity-100"
-              : "invisible top-[80px]"
-          }`}
-        >
-          {navigation.map(({ href, name }) => (
-            <Link key={name} href={href} onClick={closeNav}>
-              <div className="flex h-[48px] cursor-pointer items-center border-b border-[#EAEAEA] text-[16px] hover:bg-[#FAFAFA]">
-                {name}
-              </div>
-            </Link>
-          ))}
+          )}
         </div>
       </div>
     </div>
