@@ -1,5 +1,5 @@
 import { type NextPage } from "next";
-
+import Link from "next/link";
 import Legal from "~/components/Legal";
 
 const Terms: NextPage = () => {
@@ -86,12 +86,12 @@ const Terms: NextPage = () => {
             browser to prevent cookies, but please note that disabling cookies
             may make some features or functionality unavailable to you. For more
             information about the cookies we use, please see our{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="/cookie-policy"
             >
               Cookie Policy
-            </a>
+            </Link>
             .
           </li>
         </ul>
@@ -246,12 +246,12 @@ const Terms: NextPage = () => {
         </p>
         <p className="mb-5">
           Learn more about our security and compliance efforts on our{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="/security"
           >
             Security
-          </a>{" "}
+          </Link>{" "}
           page.
         </p>
         <h2 className="my-5 text-lg font-bold">Data Retention</h2>
@@ -285,12 +285,12 @@ const Terms: NextPage = () => {
             laws of the European Economic Area (EEA), Switzerland, and UK and
             for other international transfers of Customer Data to the extent
             required by applicable law. Our{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="/dpa"
             >
               Data Processing Addendum
-            </a>{" "}
+            </Link>{" "}
             incorporates the standard contractual clauses.
           </li>
           <li>
@@ -316,46 +316,46 @@ const Terms: NextPage = () => {
             authorities with regard to human resources data transferred from the
             EU in the context of the employment relationship. Please send any
             questions or complaints regarding our Privacy Shield compliance to{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="mailto:privacy@snapify.it"
               rel="noopener"
               target="_blank"
             >
               privacy@snapify.it
-            </a>{" "}
+            </Link>{" "}
             or for unresolved complaints you may invoke binding arbitration, at
             no cost to you, from{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="https://www.jamsadr.com/file-an-eu-us-privacy-shield-claim"
               rel="noopener"
               target="_blank"
             >
               JAMS
-            </a>
+            </Link>
             , which is an independent dispute resolution body in the United
             States. Competent EU and Swiss data protection authorities (or a
             panel established by those authorities) may also address complaints
             and provide appropriate recourse free of charge with respect to our
             Privacy Shield compliance, or you can otherwise{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="https://www.privacyshield.gov/article?id=ANNEX-I-introduction"
               rel="noopener"
               target="_blank"
             >
               resolve a complaint by invoking binding arbitration
-            </a>
+            </Link>
             . You can view Snapify’s Privacy Shield certification on the{" "}
-            <a
+            <Link
               className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
               href="https://www.privacyshield.gov/list"
               rel="noopener"
               target="_blank"
             >
               Privacy Shield website
-            </a>
+            </Link>
             .
           </li>
         </ul>
@@ -373,14 +373,14 @@ const Terms: NextPage = () => {
           are unable to exercise your rights through your Snapify account,
           please contact the administrator of your Workspace, or otherwise you
           can{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             send us your request
-          </a>
+          </Link>
           .
         </p>
         <h2 className="my-5 text-lg font-bold">Age Requirement</h2>
@@ -391,14 +391,14 @@ const Terms: NextPage = () => {
           someone under 13 or the applicable age of digital consent has provided
           us with personal information in violation of this Privacy Policy,
           please{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             contact us
-          </a>
+          </Link>
           , and we will take steps to delete the information.
         </p>
         <h2 className="my-5 text-lg font-bold">
@@ -409,12 +409,12 @@ const Terms: NextPage = () => {
           we process Customer Data only according to our customers’ instructions
           in accordance with our Terms of Service. For a list of our
           subprocessors, please visit our{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="/privacy-policy.tsx"
           >
             Privacy for Humans
-          </a>{" "}
+          </Link>{" "}
           page. Snapify acts as a controller for other types of personal data
           where Snapify determines the purposes and means of processing of that
           data, such as personal data used for marketing or research purposes.
@@ -448,14 +448,14 @@ const Terms: NextPage = () => {
         </ul>
         <p className="mb-5">
           You may{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             email us
-          </a>{" "}
+          </Link>{" "}
           or contact one of our appointed representatives in the EU and UK below
           if you have questions or issues relating to your personal data:
         </p>
@@ -618,14 +618,14 @@ const Terms: NextPage = () => {
           <br />
           To take advantage of your right to access, delete, or correct under
           California law please contact us by email at{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             privacy@snapify.it
-          </a>
+          </Link>
           . We may request certain information to verify your identity before we
           can respond to your access and deletion requests. We will confirm
           receipt of your request within 10 business days and will respond to
@@ -711,14 +711,14 @@ const Terms: NextPage = () => {
         </p>
         <p className="mb-5">
           To make an access, deletion, or correction request, please email{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             privacy@snapify.it
-          </a>
+          </Link>
           . Before completing your request, we may need to verify your identity.
           We may request additional documentation or information solely for the
           purpose of verifying your identity.
@@ -735,14 +735,14 @@ const Terms: NextPage = () => {
         <p className="mb-5">
           To appeal our decision regarding a request related to these rights,
           you may email us at{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             privacy@snapify.it
-          </a>
+          </Link>
           .
         </p>
         <h2 className="my-5 text-lg font-bold">
@@ -758,25 +758,25 @@ const Terms: NextPage = () => {
         </p>
         <p className="mb-5">
           View the{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="/previous-privacy-policy-2021"
           >
             previous version
-          </a>{" "}
+          </Link>{" "}
           of this Privacy Policy.
         </p>
         <h2 className="my-5 text-lg font-bold">Questions?</h2>
         <p className="mb-5">
           Email us questions at{" "}
-          <a
+          <Link
             className="text-blurple hover:text-purple-hover thd-focus-thin cursor-pointer pb-1 underline"
             href="mailto:privacy@snapify.it"
             rel="noopener"
             target="_blank"
           >
             privacy@snapify.it
-          </a>
+          </Link>
           .
         </p>
       </div>
