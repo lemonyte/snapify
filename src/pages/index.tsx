@@ -2,7 +2,6 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { api } from "~/utils/api";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { getTime } from "~/utils/getTime";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
@@ -10,19 +9,11 @@ import { useAtom } from "jotai";
 import uploadVideoModalOpen from "~/atoms/uploadVideoModalOpen";
 import recordVideoModalOpen from "~/atoms/recordVideoModalOpen";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const VideoList: NextPage = () => {
   const [, setRecordOpen] = useAtom(recordVideoModalOpen);
   const [, setUploadOpen] = useAtom(uploadVideoModalOpen);
-  const router = useRouter();
   const { data: videos, isLoading } = api.video.getAll.useQuery();
-  const searchParams = useSearchParams();
-  // const [closeWindow, setCloseWindow] = useState<boolean>(false);
-  const [, setCloseWindow] = useState<boolean>(false);
-  const checkoutCanceledQueryParam = searchParams.get("checkoutCanceled");
-  const closeQueryParam = searchParams.get("close");
 
   const openRecordModal = () => {
     if (
@@ -37,22 +28,6 @@ const VideoList: NextPage = () => {
   const openUploadModal = () => {
     setUploadOpen(true);
   };
-
-  useEffect(() => {
-    const closeWindow =
-      (window.innerWidth === 500 &&
-        (window.innerHeight === 499 || window.innerHeight === 500)) ||
-      closeQueryParam === "true";
-    setCloseWindow(closeWindow);
-  }, [closeQueryParam]);
-
-  useEffect(() => {
-    if (checkoutCanceledQueryParam && closeQueryParam === "false") {
-      setTimeout(() => {
-        void router.push("/").then(() => router.reload());
-      }, 5000);
-    }
-  }, [checkoutCanceledQueryParam, closeQueryParam, router]);
 
   return (
     <div className="flex h-screen flex-col">
