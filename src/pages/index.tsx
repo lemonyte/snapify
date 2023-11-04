@@ -55,7 +55,7 @@ const VideoList: NextPage = () => {
   }, [checkoutCanceledQueryParam, closeQueryParam, router]);
 
   return (
-    <>
+    <div className="flex h-screen flex-col">
       <Head>
         <title>Library | Snapify</title>
         <meta
@@ -65,7 +65,7 @@ const VideoList: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header isPublic={false} />
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
+      <main className="flex flex-col grow items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div
           className="flex w-full grow items-start justify-center overflow-auto bg-[#fbfbfb] pt-14"
           suppressHydrationWarning={true}
@@ -126,7 +126,7 @@ const VideoList: NextPage = () => {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 
