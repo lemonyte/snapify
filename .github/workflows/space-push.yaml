@@ -3,7 +3,7 @@ name: Push to Space
 on:
   push:
     branches:
-      - main
+      - deta-space
 
 concurrency: push-${{ github.sha }}
 
