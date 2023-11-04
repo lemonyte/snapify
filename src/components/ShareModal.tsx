@@ -74,7 +74,7 @@ export default function ShareModal({ video }: Props) {
     <>
       <span
         onClick={openModal}
-        className="mr-4 max-h-[35px] cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc]"
+        className="mr-4 max-h-[35px] cursor-pointer rounded border border-[#0000001a] px-2 py-2 text-sm text-[#292d34] hover:bg-[#fafbfc] whitespace-nowrap"
       >
         Share
       </span>
