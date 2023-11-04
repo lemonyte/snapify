@@ -1,5 +1,6 @@
-<h3 align="center">Snapify</h3>
-<p align="center">The personal Loom alternative.</p>
+# Snapify
+
+The personal Loom alternative.
 
 **This is a port of [Snapify](https://github.com/MarconLP/snapify) to [Deta Space](https://deta.space)**
 
