@@ -15,3 +15,4 @@ Snapify is the easiest way to share screen recordings.
 - Record your screen
 - Upload existing videos
 - Share recordings
+- Set expiration time for links and recordings
