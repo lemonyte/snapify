@@ -1,35 +1,31 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "~/server/db";
-import { getFilestore } from "~/utils/filestore";
-import { verifySignature } from "@upstash/qstash/nextjs";
-import type { Video } from "~/server/db";
+import { deleteVideo } from "~/utils/filestore";
+import { db, type VideoMetadata } from "~/server/db";
 
-export default verifySignature(async function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const expiredVideos = await db.findMany<Video>({
-    "shareLinkExpiresAt?le": new Date().getTime(),
+  const expiredVideos = await db.findMany<VideoMetadata>({
+    "shareLinkExpiresAt?lte": new Date().getTime(),
     delete_after_link_expires: true,
     sharing: true,
   });
 
-  const updatedVideos = await db.updateMany(
+  const updatedVideos = await db.updateMany<VideoMetadata>(
     {
-      "shareLinkExpiresAt?le": new Date().getTime(),
+      "shareLinkExpiresAt?lte": new Date().getTime(),
       delete_after_link_expires: false,
       sharing: true,
     },
     { sharing: false }
   );
 
-  const expiredVideoIds = expiredVideos.map((x) => x.id);
   expiredVideos.map(async (video) => {
-    return await getFilestore().delete(video.id)
+    await deleteVideo(video.id);
   });
 
-  const query = expiredVideoIds.map(x => ({ id: x }));
-  const deletedVideos = await db.deleteMany(query);
+  const deletedVideos = expiredVideos.length !== 0 ? await db.deleteMany<VideoMetadata>(expiredVideos.map((video) => ({ id: video.id }))) : [];
 
   res.status(200).json({ expiredVideos, updatedVideos, deletedVideos });
-});
+}

@@ -7,6 +7,13 @@ micros:
     engine: next
     primary: true
     dev: npm run dev
+    presets:
+      api_keys: true
+    actions:
+      - id: check-expired-videos
+        name: Check for expired videos
+        trigger: schedule
+        default_interval: 0 * * * *
     public_routes:
       - /favicon.ico
       - /_next/*
