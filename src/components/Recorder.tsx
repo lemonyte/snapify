@@ -203,7 +203,7 @@ export default function Recorder({ closeModal, step, setStep }: Props) {
         throw new Error("Failed to create video, please try again.");
       }
       await uploadVideo(video.id, blob, videoRef);
-      void router.push("share/" + video.id);
+      void router.push("/private/" + video.id);
       setRecordOpen(false);
     } catch (err) {
       throw err;

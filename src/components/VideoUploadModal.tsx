@@ -36,7 +36,7 @@ export default function VideoUploadModal() {
     const id = video.id;
     await uploadVideo(id, file, videoRef);
     setOpen(false);
-    void router.push(`share/${id}`);
+    void router.push(`/private/${id}`);
 
     setSubmitting(false);
     void apiUtils.video.getAll.invalidate();
